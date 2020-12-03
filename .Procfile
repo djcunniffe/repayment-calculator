@@ -1,1 +1,1 @@
-web: streamlit run calculator.py
+web: streamlit run --server.enableCORS false --server.port $PORT calculator.py
