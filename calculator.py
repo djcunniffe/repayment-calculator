@@ -4,6 +4,7 @@ import datetime as dt
 import streamlit as st
 
 st.title('Repayment Calculator')
+st.write('To only be used for customers pre-disbursement')
 
 loan_amount = st.number_input('Loan Amount', min_value=10000, step=1000)
 
