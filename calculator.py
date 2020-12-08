@@ -30,14 +30,16 @@ grace_period = round((first_repayment_date - disbursement_date).days/365.25*12)
 grace_amount = np.fv(interest_rate/100/12, grace_period,0,loan_amount+admin_fee)
 
 grace_amount = loan_amount*(1+(interest_rate/100/12)*grace_period) + admin_fee*(1+(interest_rate/100/12)*grace_period)
-st.write('Grace Amount: ', abs(round(grace_amount)))
+st.write('Opening Balance at Repayment: ', abs(round(grace_amount)))
 
 try:
     payment = np.pmt(interest_rate/100/12, early_repayment*12, abs(grace_amount))
     st.write('Monthly Repayment: ', abs(round(payment)))
-    st.write('Total Repayable: ', abs(round(payment))*early_repayment*12)
+    st.write('Total Repayable Amount: ', abs(round(payment))*early_repayment*12)
+    st.write('Total Interest: ', abs((round(payment))*early_repayment*12) - loan_amount)
 except OverflowError as overflow:
-    st.write('Total Repayable: ', abs(round(grace_amount)))
+    st.write('Total Repayable Amount: ', abs(round(grace_amount)))
+    st.write('Total Interest: ', abs(round(grace_amount) - loan_amount))
 
 try:
     dataset.post([
