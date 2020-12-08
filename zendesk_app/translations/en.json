@@ -1,0 +1,8 @@
+{
+  "app": {
+    "name": "Repayment Calculator",
+    "short_description": "Calculates early repayment scenarios",
+    "long_description": "Calculates early repayment scenarios for customers who do not yet have a disbursed loan",
+    "installation_instructions": "Simply click install."
+  }
+}

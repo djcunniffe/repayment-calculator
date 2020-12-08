@@ -1,0 +1,17 @@
+{
+  "name": "Repayment Calculator",
+  "author": {
+    "name": "Dylan Cunniffe",
+    "email": "dylan@cunniffe.co.za",
+    "url": "https://dylancunniffe.com"
+  },
+  "defaultLocale": "en",
+  "private": true,
+  "location": {
+    "support": {
+      "nav_bar": "https://repayment-calculator.herokuapp.com/"
+    }
+  },
+  "version": "1.0",
+  "frameworkVersion": "2.0"
+}
