@@ -2,6 +2,13 @@
 import numpy as np
 import datetime as dt
 import streamlit as st
+import os, sys
+import geckoboard
+
+client = geckoboard.client(os.environ['GECKOBOARD_KEY'])
+dataset = client.datasets.find_or_create('prototype.repayments_calculator', {
+    'calculation' : {'type' : 'number', 'name' : 'Calculations', 'optional' : False}
+})
 
 st.title('Repayment Calculator')
 st.write('To only be used for customers pre-disbursement')
@@ -32,5 +39,12 @@ try:
     st.write('Total Repayable: ', abs(round(payment))*early_repayment*12)
 except OverflowError as overflow:
     st.write('Total Repayable: ', abs(round(grace_amount)))
+
+try:
+    dataset.post([
+    {'calculation' : 1}
+    ])
+except Exception as e:
+    print(e)
 
 
