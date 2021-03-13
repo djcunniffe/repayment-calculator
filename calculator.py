@@ -2,13 +2,11 @@
 import numpy as np
 import datetime as dt
 import streamlit as st
+import pandas as pd
 import os, sys
-import geckoboard
 
-client = geckoboard.client(os.environ['GECKOBOARD_KEY'])
-dataset = client.datasets.find_or_create('prototype.repayments_calculator', {
-    'calculation' : {'type' : 'number', 'name' : 'Calculations', 'optional' : False}
-})
+st.set_page_config(page_title='Repayment Calculator',
+                   layout="wide")
 
 st.title('Repayment Calculator')
 st.write('To only be used for customers pre-disbursement')
@@ -23,29 +21,31 @@ disbursement_date = st.date_input('Disbursement Date')
 
 first_repayment_date = st.date_input('First Repayment Date')
 
-early_repayment = st.slider('Years to repay',min_value=0, max_value=20,value=7, step=1)
-
+term_select = st.multiselect('Select Terms', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15])
 grace_period = round((first_repayment_date - disbursement_date).days/365.25*12)
 
 grace_amount = np.fv(interest_rate/100/12, grace_period,0,loan_amount+admin_fee)
 
 grace_amount = loan_amount*(1+(interest_rate/100/12)*grace_period) + admin_fee*(1+(interest_rate/100/12)*grace_period)
-st.write('Opening Balance at Repayment: ', abs(round(grace_amount)))
+opening_balance = abs(round(grace_amount))
+cols = ['Term', 'Opening Balance at Repayment', 'Monthly Repayment', 'Total Repayable Amount', 'Total Interest']
+df_terms = pd.DataFrame(index=term_select, columns=cols)
 
-try:
-    payment = np.pmt(interest_rate/100/12, early_repayment*12, abs(grace_amount))
-    st.write('Monthly Repayment: ', abs(round(payment)))
-    st.write('Total Repayable Amount: ', abs(round(payment))*early_repayment*12)
-    st.write('Total Interest: ', abs((round(payment))*early_repayment*12) - loan_amount)
-except OverflowError as overflow:
-    st.write('Total Repayable Amount: ', abs(round(grace_amount)))
-    st.write('Total Interest: ', abs(round(grace_amount) - loan_amount))
+for term in term_select:
+    try:
+        payment = np.pmt(interest_rate/100/12, term*12, abs(grace_amount))
+        monthly_payment = abs(round(payment))
+        total_payable = abs(round(payment))*term*12
+        total_interest = abs((round(payment))*term*12) - loan_amount
+        df_temp = pd.DataFrame([[str(term) + ' Years', opening_balance, monthly_payment, total_payable, total_interest]], columns=cols)
+        df_terms = df_terms.append(df_temp)
+    except OverflowError as overflow:
+        total_payable = abs(round(grace_amount))
+        total_interest = abs(round(grace_amount) - loan_amount)
+        df_temp = pd.DataFrame([[str(term) + ' Years', opening_balance, 0, total_payable, total_interest]], columns=cols)
+        df_terms = df_terms.append(df_temp)
 
-try:
-    dataset.post([
-    {'calculation' : 1}
-    ])
-except Exception as e:
-    print(e)
-
-
+if st.button('Generate'):
+    st.dataframe(df_terms.groupby('Term').sum())
+    st.write("Please note these are estimated amounts")
+    st.balloons()
