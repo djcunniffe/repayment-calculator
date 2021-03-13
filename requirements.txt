@@ -76,3 +76,5 @@ wcwidth==0.2.5
 webencodings==0.5.1
 widgetsnbextension==3.5.1
 geckoboard.py==1.0.0
+bokeh==2.3.0
+streamlit_bokeh_events==0.1.2
